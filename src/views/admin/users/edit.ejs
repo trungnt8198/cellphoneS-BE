@@ -1,0 +1,257 @@
+<body>
+  <div class="content-header">
+    <h1><%= title %></h1>
+    <div>
+      <a href="/admin/users" class="btn btn-secondary">
+        <i class="fas fa-arrow-left"></i> Back to Users
+      </a>
+      <a
+        href="#"
+        class="btn btn-danger"
+        id="deleteUserBtn"
+        style="margin-left: 10px"
+      >
+        <i class="fas fa-trash"></i> Delete User
+      </a>
+    </div>
+  </div>
+
+  <!-- Success Message -->
+  <div
+    id="successMessage"
+    class="message message-success"
+    style="display: none"
+  >
+    <i class="fas fa-check-circle"></i>
+    <span data-message-text>User has been updated successfully.</span>
+  </div>
+
+  <!-- Edit User Form -->
+  <form
+    id="editUserForm"
+    class="card"
+    method="POST"
+    action="/admin/users/<%= old.id %>?_method=PUT"
+  >
+    <div class="card-header">
+      <h3>User Information</h3>
+    </div>
+    <div class="card-body">
+      <div class="form-section">
+        <h3>Personal Information</h3>
+        <div class="form-group">
+          <label for="first_name">First Name*</label>
+          <input
+            type="text"
+            id="first_name"
+            name="first_name"
+            class="form-control"
+            data-validate="name"
+            value="<%= old.first_name %>"
+          />
+          <span class="error-text" id="firstNameError"></span>
+        </div>
+
+        <div class="form-group">
+          <label for="last_name">Last Name*</label>
+          <input
+            type="text"
+            id="last_name"
+            name="last_name"
+            class="form-control"
+            data-validate="name"
+            value="<%= old.last_name %>"
+          />
+          <span class="error-text" id="lastNameError"></span>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="userEmail">Email*</label>
+            <input
+              type="text"
+              value="<%= old?.email %>"
+              id="userEmail"
+              name="email"
+              class="form-control"
+            />
+            <% if(typeof errors !== 'undefined' && errors?.email) { %>
+            <span class="error-text" id="userEmailError"
+              ><%= errors.email %></span
+            >
+            <% } %>
+          </div>
+
+          <div class="form-group">
+            <label for="userPhone">Phone</label>
+            <input
+              type="tel"
+              id="userPhone"
+              name="phone"
+              value="<%= old?.phone %>"
+              class="form-control"
+              data-validate="phone"
+            />
+            <% if(typeof errors !== 'undefined' && errors?.phone) { %>
+            <span class="error-text" id="userPhoneError"
+              ><%= errors.phone %></span
+            >
+            <% } %>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="userAddress">Address</label>
+          <textarea
+            id="userAddress"
+            name="address"
+            class="form-control"
+            rows="2"
+            value="<%= old.address %>"
+          ></textarea>
+          <span class="error-text" id="userAddressError"></span>
+        </div>
+      </div>
+
+      <div class="form-section">
+        <h3>Account Information</h3>
+        <div class="form-group">
+          <label for="userUsername">Username*</label>
+          <input
+            type="text"
+            id="userUsername"
+            name="username"
+            value="<%= old?.username %>"
+            class="form-control"
+            data-validate="username"
+          />
+          <% if(typeof errors !== 'undefined' && errors?.username) { %>
+          <span class="error-text" id="userUsernameError"
+            ><%= errors.username %></span
+          >
+          <% } %>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="role">Role*</label>
+            <select id="userRole" name="role" class="form-control">
+              <% const options = [ {title: "Select Role", value: ""},
+              {title:"Administrator", value: "admin"}, {title: "Editor",
+              value:"editor"}, {title: "Viewer Role", value: "viewer"} ];
+              for(let option of options) { %>
+              <option <%= option.value == old.role ? "selected" : "" %>  value="<%= option.value %>"><%= option.title %></option>
+              <% } %>
+            </select>
+            <span class="error-text" id="userRoleError"></span>
+          </div>
+
+          <div class="form-group">
+            <label for="status">Status*</label>
+            <select id="userStatus" name="status" class="form-control">
+            <% const statuses = [ {title: "Select Status", value: ""},
+              {title:"Active", value: "active"}, {title: "Inactive",
+              value:"inactive"}, {title: "Pending", value: "pending"} ];
+              for(let status of statuses) { %>
+              <option <%= status.value == old.status ? "selected" : "" %>  value="<%= status.value %>"><%= status.title %></option>
+              <% } %>
+            </select>
+            <span class="error-text" id="userStatusError"></span>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-section">
+        <h3>Password</h3>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="password">Password*</label>
+            <input
+              type="password"
+              id="userPassword"
+              name="password"
+              class="form-control"
+              data-validate="password"
+            />
+            <span class="error-text" id="userPasswordError"></span>
+          </div>
+
+          <div class="form-group">
+            <label for="confirm_password">Confirm Password*</label>
+            <input
+              type="password"
+              id="userConfirmPassword"
+              name="confirm_password"
+              class="form-control"
+            />
+            <span class="error-text" id="userConfirmPasswordError"></span>
+          </div>
+        </div>
+        <p
+          class="form-help-text"
+          style="color: #666; font-size: 13px; margin-top: 5px"
+        >
+          Password must be at least 8 characters and include uppercase,
+          lowercase, number, and special character.
+        </p>
+      </div>
+
+      <div class="form-buttons">
+        <button type="button" class="btn btn-secondary" id="cancelBtn">
+          Cancel
+        </button>
+        <button type="submit" class="btn btn-primary">
+          <i class="fas fa-save"></i> Save Changes
+        </button>
+      </div>
+    </div>
+  </form>
+
+  <!-- Confirm Delete Modal -->
+  <div class="modal" id="confirmDeleteModal">
+    <div class="modal-content">
+      <h3 class="modal-title">Confirm Delete</h3>
+      <div class="modal-body">
+        Are you sure you want to delete user "<span id="deleteUserName"></span
+        >"? This action cannot be undone.
+      </div>
+      <div class="modal-footer">
+        <button
+          type="button"
+          id="cancelDelete"
+          class="btn btn-secondary"
+          data-cancel
+        >
+          Cancel
+        </button>
+        <button
+          type="button"
+          id="confirmDelete"
+          class="btn btn-danger"
+          data-confirm
+        >
+          Delete
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script src="/assets/js/common.js"></script>
+
+  <style>
+    /* Additional styling for checkbox groups */
+    .checkbox-group {
+      margin-bottom: 10px;
+    }
+
+    .checkbox-group input[type="checkbox"] {
+      margin-right: 8px;
+    }
+
+    .form-help-text {
+      margin-top: 5px;
+      color: #666;
+      font-size: 13px;
+    }
+  </style>
+</body>
